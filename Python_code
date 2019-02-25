@@ -1,1 +1,43 @@
 #bitcoin prediction
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 18 16:58:39 2019
+
+@author: af98828
+"""
+
+from urllib.request import urlopen
+import json
+from pandas.io.json import json_normalize
+import pandas as pd
+
+response = urlopen("https://www.coinbase.com/api/v2/prices/BTC-USD/historic?period=all")
+json_data = response.read().decode('utf-8', 'replace')
+
+d = json.loads(json_data)
+df = json_normalize(d['data']['prices'])
+
+
+
+#buy if BTC PRICE DIFFERENCE CLOSES MORE THAN $80 ABOVE THE PRIOR DAY CLOSE PRICE
+def calculate(TimeStamp1,TimeStamp2):
+    if TimeStamp1>TimeStamp2:
+        row1 = df.loc[df['time'] == TimeStamp1]
+        row2 = df.loc[df['time'] == TimeStamp2]
+        print('row')
+        print(row1['price'])
+        print(row2['price'])
+        price_diff=row1['price'].astype(float)-row2['price'].astype(float)
+        print('price_diff')
+        print(price_diff)
+        if price_diff>80:
+            return 'BUY'
+        else:
+            if price_diff<80 and price_diff>60:
+                return 'hold'
+            else:
+                return 'sell'
+    else:
+        return 'Current timestamp should be greater than previous timestamp'
+            
+ calculate('2019-02-18T00:00:00Z','2019-02-17T00:00:00Z')       
